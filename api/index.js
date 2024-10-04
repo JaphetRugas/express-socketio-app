@@ -21,10 +21,8 @@ socketConfig(io);
 // Export the server for Vercel
 module.exports = app;
 
-// Start the server only when not in production
-if (process.env.NODE_ENV !== 'production') {
-    const PORT = process.env.PORT || 3000; // Use environment variable for the port
-    server.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
-    });
-}
+// Start the server (Vercel will handle this)
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
