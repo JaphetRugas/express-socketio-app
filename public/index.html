@@ -4,40 +4,136 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Socket.IO Chat</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .chatroom {
+        display: flex;
+        flex-direction: column;
+        height: 600px;
+        width: 100%;
+        max-width: 400px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #fff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+        background-color: #007bff;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+    }
+    .messages {
+        flex-grow: 1;
+        padding: 10px;
+        overflow-y: auto;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+    }
+    .message {
+        display: flex;
+        align-items: start;
+        margin-bottom: 10px;
+    }
+    .message-content {
+        background-color: #e9ecef;
+        border-radius: 8px;
+        padding: 10px;
+        max-width: 80%;
+        position: relative;
+    }
+    .message.you {
+        justify-content: flex-end; /* Align your messages to the right */
+    }
+    .message.you .message-content {
+        background-color: #007bff;
+        color: white;
+        margin-left: auto; /* Move your messages to the right */
+    }
+    .input-area {
+        padding: 10px;
+        border-top: 1px solid #ddd;
+        display: flex;
+    }
+    .input-area input {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        outline: none;
+        transition: border 0.2s;
+    }
+    .input-area input:focus {
+        border-color: #007bff;
+    }
+    .input-area button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 15px;
+        margin-left: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .input-area button:hover {
+        background-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
-  <h1>Socket.IO Chat</h1>
-  
-  <div>
-    <input id="username" placeholder="Enter your name" autocomplete="off" />
-  </div>
-  
-  <div id="chat">
-    <ul id="messages"></ul>
-  </div>
-  
-  <input id="input" autocomplete="off" />
-  <button id="send">Send</button>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
+<div class="chatroom">
+    <div class="header">Socket.IO Chat</div>
+    
+    <div>
+        <input id="username" placeholder="Enter your name" autocomplete="off" />
+    </div>
+    
+    <div class="messages" id="messages"></div>
+    
+    <div class="input-area">
+        <input id="input" placeholder="Type your message..." autocomplete="off" />
+        <button id="send">Send</button>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
     const socket = io();
 
     // Send message on button click
     document.getElementById('send').onclick = function () {
-      const input = document.getElementById('input');
-      const username = document.getElementById('username').value || 'Anonymous'; // Default to 'Anonymous' if no name provided
-      const message = `${username}: ${input.value}`; // Format message with username
-      socket.emit('message', message);
-      input.value = '';
+        const input = document.getElementById('input');
+        const username = document.getElementById('username').value || 'Anonymous'; // Default to 'Anonymous' if no name provided
+        const message = { username, text: input.value }; // Create an object for the message
+        socket.emit('message', message); // Emit the message to the server
+        input.value = ''; // Clear input field
     };
 
     // Listen for new messages
     socket.on('message', function (msg) {
-      const item = document.createElement('li');
-      item.textContent = msg;
-      document.getElementById('messages').appendChild(item);
+        const item = document.createElement('div');
+        item.className = 'message ' + (msg.username === 'Anonymous' ? '' : 'you'); // Add 'you' class for your messages
+        item.innerHTML = `
+            <div class="message-content">
+                <strong>${msg.username}:</strong> ${msg.text}
+            </div>
+        `;
+        document.getElementById('messages').appendChild(item); // Append message to messages list
     });
-  </script>
+</script>
+
 </body>
 </html>

@@ -1,8 +1,11 @@
-exports.handleMessage = (io, socket, msg) => {
-  console.log("Message received:", msg); 
+// Handle incoming message from a client
+exports.handleMessage = (io, socket, msg) => { 
+  console.log("Message received:", msg);
+  // Broadcast the message to all connected clients
   io.emit("message", msg);
 };
 
-exports.handleDisconnect = (socket) => {
+// Handle client disconnection event
+exports.handleDisconnect = (socket) => { 
   console.log("User disconnected:", socket.id);
 };
