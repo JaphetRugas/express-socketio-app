@@ -7,16 +7,18 @@ const statusRoutes = require('../routes/statusRoutes');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    cors: {
+      origin: '*',
+      methods: ['GET', 'POST']
+    },
+    transports: ['websocket', 'polling'],
+    allowEIO3: true
+  });
 
 // Setup middlewares
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
-
-// Serve Socket.IO client library
-app.get('/socket.io/socket.io.js', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'node_modules/socket.io/client-dist/socket.io.js'));
-});
 
 // Setup routes
 app.use(statusRoutes);
