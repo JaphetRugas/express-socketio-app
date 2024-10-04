@@ -7,7 +7,8 @@
   <style>
     body {
         font-family: Arial, sans-serif;
-        background-color: #f8f9fa;
+        background-color: #1c1c1c; /* Dark background */
+        color: #f8f9fa; /* Light text color */
         display: flex;
         justify-content: center;
         align-items: center;
@@ -20,14 +21,14 @@
         height: 600px;
         width: 100%;
         max-width: 400px;
-        border: 1px solid #ddd;
+        border: 1px solid #444; /* Dark border */
         border-radius: 8px;
         overflow: hidden;
-        background-color: #fff;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        background-color: #2c2c2c; /* Darker background */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Stronger shadow */
     }
     .header {
-        background-color: #007bff;
+        background-color: #007bff; /* Header background */
         color: white;
         padding: 15px;
         text-align: center;
@@ -38,47 +39,49 @@
         flex-grow: 1;
         padding: 10px;
         overflow-y: auto;
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
+        border-top: 1px solid #444; /* Dark border for messages area */
     }
     .message {
         display: flex;
-        align-items: start;
+        align-items: flex-start;
         margin-bottom: 10px;
     }
     .message-content {
-        background-color: #e9ecef;
+        background-color: #3c3c3c; /* Message background */
         border-radius: 8px;
         padding: 10px;
         max-width: 80%;
         position: relative;
+        color: #f8f9fa; /* Light text color for messages */
     }
     .message.you {
         justify-content: flex-end; /* Align your messages to the right */
     }
     .message.you .message-content {
-        background-color: #007bff;
-        color: white;
+        background-color: #007bff; /* Your messages background */
+        color: white; /* Text color for sent messages */
         margin-left: auto; /* Move your messages to the right */
     }
     .input-area {
         padding: 10px;
-        border-top: 1px solid #ddd;
+        border-top: 1px solid #444; /* Dark border for input area */
         display: flex;
     }
     .input-area input {
         flex-grow: 1;
         padding: 10px;
-        border: 1px solid #ddd;
+        border: 1px solid #444; /* Dark input border */
         border-radius: 4px;
         outline: none;
         transition: border 0.2s;
+        background-color: #3c3c3c; /* Dark input background */
+        color: #f8f9fa; /* Light text color for input */
     }
     .input-area input:focus {
-        border-color: #007bff;
+        border-color: #007bff; /* Focus border color */
     }
     .input-area button {
-        background-color: #007bff;
+        background-color: #007bff; /* Button background */
         color: white;
         border: none;
         border-radius: 4px;
@@ -88,7 +91,19 @@
         transition: background-color 0.2s;
     }
     .input-area button:hover {
-        background-color: #0056b3;
+        background-color: #0056b3; /* Button hover color */
+    }
+    .icon {
+        width: 24px; /* Smaller icon size */
+        height: 24px; /* Smaller icon size */
+        border-radius: 50%; /* Circular icon */
+        margin-right: 8px; /* Space between icon and message */
+        background-color: #007bff; /* Icon background */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white; /* Icon text color */
+        font-size: 14px; /* Adjust font size for icon */
     }
   </style>
 </head>
@@ -96,10 +111,6 @@
 
 <div class="chatroom">
     <div class="header">Socket.IO Chat</div>
-    
-    <div>
-        <input id="username" placeholder="Enter your name" autocomplete="off" />
-    </div>
     
     <div class="messages" id="messages"></div>
     
@@ -116,20 +127,29 @@
     // Send message on button click
     document.getElementById('send').onclick = function () {
         const input = document.getElementById('input');
-        const username = document.getElementById('username').value || 'Anonymous'; // Default to 'Anonymous' if no name provided
-        const message = { username, text: input.value }; // Create an object for the message
-        socket.emit('message', message); // Emit the message to the server
+        const messageText = input.value.trim(); // Trim whitespace
+
+        if (messageText === '') {
+            return; // Prevent sending empty messages
+        }
+
+        // Emit message with the socket ID of the sender
+        socket.emit('message', { text: messageText, senderId: socket.id });
         input.value = ''; // Clear input field
     };
 
     // Listen for new messages
     socket.on('message', function (msg) {
         const item = document.createElement('div');
-        item.className = 'message ' + (msg.username === 'Anonymous' ? '' : 'you'); // Add 'you' class for your messages
+
+        // Determine the sender by comparing socket IDs
+        item.className = 'message ' + (msg.senderId === socket.id ? 'you' : ''); // Use socket ID for message classification
         item.innerHTML = `
+            ${msg.senderId === socket.id ? '' : `<div class="icon">${msg.senderId.slice(0, 2).toUpperCase()}</div>`} <!-- Placeholder icon for others -->
             <div class="message-content">
-                <strong>${msg.username}:</strong> ${msg.text}
+                ${msg.text} <!-- Display the message text -->
             </div>
+            ${msg.senderId === socket.id ? `<div class="icon">${msg.senderId.slice(0, 2).toUpperCase()}</div>` : ''} <!-- Placeholder icon for self -->
         `;
         document.getElementById('messages').appendChild(item); // Append message to messages list
     });
