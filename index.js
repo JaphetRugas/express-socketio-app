@@ -2,7 +2,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const socketConfig = require('./config/socket');
-const routes = require('./routes');
+const statusRoutes  = require('./routes/statusRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.static('public')); // Serve static files (e.g., index.html)
 
 // Setup routes
-app.use(routes);
+app.use(statusRoutes );
 
 // Setup Socket.IO
 socketConfig(io);

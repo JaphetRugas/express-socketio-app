@@ -1,6 +1,5 @@
 exports.handleMessage = (io, socket, msg) => {
-  console.log("Message received:", msg);
-  // Emit the message to all clients
+  console.log("Message received:", msg); 
   io.emit("message", msg);
 };
 

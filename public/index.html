@@ -7,9 +7,15 @@
 </head>
 <body>
   <h1>Socket.IO Chat</h1>
+  
+  <div>
+    <input id="username" placeholder="Enter your name" autocomplete="off" />
+  </div>
+  
   <div id="chat">
     <ul id="messages"></ul>
   </div>
+  
   <input id="input" autocomplete="off" />
   <button id="send">Send</button>
 
@@ -20,7 +26,9 @@
     // Send message on button click
     document.getElementById('send').onclick = function () {
       const input = document.getElementById('input');
-      socket.emit('message', input.value);
+      const username = document.getElementById('username').value || 'Anonymous'; // Default to 'Anonymous' if no name provided
+      const message = `${username}: ${input.value}`; // Format message with username
+      socket.emit('message', message);
       input.value = '';
     };
 
